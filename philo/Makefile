@@ -1,42 +1,51 @@
 NAME 		= philo
 CC 			= gcc
 CFLAGS 		= -I. -g3 -g -fsanitize=address -Wall -Wextra -Werror
+THREAD_FLG	= -pthread
 
 RED			= \033[1;31m
 BLUE		= \033[1;34m
 RESET		= \033[0m
+GREEN		= \033[0;32m
 
-SRC			= philo.c
+SRC			= philo.c	\
+			  philo_utils.c	\
+
 
 OBJ = $(SRC:.c=.o)
 
 all: cute ${NAME}
 
 ${NAME}: $(OBJ)
-		@echo "$(BLUE)███████████████████████ Making Philo ███████████████████████$(RESET)"
-		@$(CC) $(CFLAGS) -lm $(SRC) -o $(NAME)
-		@echo "$(BLUE)███████████████████████ Compiling is DONE ██████████████████████$(RESET)"
+		@$(CC) $(CFLAGS) ${THREAD_FLG} -lm $(SRC) -o $(NAME)
+		@echo "$(GREEN)███████████████████████ Compilation DONE ██████████████████████$(RESET)"
 
 %.o: %.c
-	@${CC} ${CFLAGS} -c $< -o $@
+	@${CC} ${CFLAGS} ${THREAD_FLG} -c $< -o $@
 
 clean:
 		@rm -rf $(OBJ)
-		@echo "$(RED)OBJECT FILES DELETED$(RESET)"
+		@echo "OBJECT FILES $(RED)DELETED$(RESET)"
 
 fclean: clean
 		@rm -rf $(NAME) $(OBJ)
-		@echo "$(RED)PHILO DELETED$(RESET)"
+		@echo "PHILO $(RED)DELETED$(RESET)"
 
 re: fclean all
 
 .PHONY: all clean fclean re
 
 cute:
-	@echo "███╗   ███╗██╗███╗   ██╗██╗   ██╗  ██╗███████╗██╗     ██╗     "
-	@echo "████╗ ████║██║████╗  ██║██║   ██║  ██║██╔════╝██║     ██║     " 
-	@echo "██╔████╔██║██║██╔██╗ ██║██║   ███████║█████╗  ██║     ██║     "
-	@echo "██║╚██╔╝██║██║██║╚██╗██║██║   ██╔══██║██╔══╝  ██║     ██║     "
-	@echo "██║ ╚═╝ ██║██║██║ ╚████║██║   ██║  ██║███████╗███████╗███████╗"
-	@echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝"
-	@echo "         Made by : \033[1;91mabolor-e\033[m"
+	@echo "$(GREEN)██████████╗     ███╗     ███╗   ███╗  ███╗            █████████═╗       "
+	@echo "███║      ███╗  ███║     ███║   ███║  ███║         ███╔═╝     ███╚═╗    "
+	@echo "███║       ███║ ███║     ███║   ███║  ███║        ███╔╝         ███╚╗   "
+	@echo "███║       ███║ ███║     ███║   ███║  ███║       ███╔╝           ███║   "
+	@echo "███║      ███╔╝ ████████████║   ███║  ███║       ███║            ███║   "
+	@echo "██████████╔═╝   ███╔═════███║   ███║  ███║       ███╚╗           ███║   "
+	@echo "███╔══════╝     ███║     ███║   ███║  ███║        ███╚╗         ███╔╝   "
+	@echo "███║            ███║     ███║   ███║  ███║         ███╚╗      ███╔═╝    "
+	@echo "███║            ███║     ███║   ███║  ████████████╗   █████████╔═╝      "
+	@echo "╚══╝            ╚══╝     ╚══╝   ╚══╝  ╚═══════════╝    ╚═══════╝        $(RESET)"
+	@echo "$(RED)██████████████████████████████████████████████████████████████████████╗ "
+	@echo "╚═════════════════════════════════════════════════════════════════════╝ $(RESET)"
+	@echo "                                              Made by : \033[1;91mabolor-e\033[m"
