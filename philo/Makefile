@@ -10,6 +10,8 @@ GREEN		= \033[0;32m
 
 SRC			= philo.c	\
 			  philo_utils.c	\
+			  data_init_parse.c \
+			  
 
 
 OBJ = $(SRC:.c=.o)
