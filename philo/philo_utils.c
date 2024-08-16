@@ -6,11 +6,27 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:50 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/14 18:33:13 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/16 18:58:29 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	ft_free(t_table *table)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->nbr_philo)
+	{
+		pthread_mutex_destroy(&table->p->philo_lock);
+		i++;
+	}
+	pthread_mutex_destroy(&table->table_lock);
+	pthread_mutex_destroy(&table->write_lock);
+	free(table->p);
+	free(table->f);
+}
 
 int	ft_thread_timing(long time)
 {
@@ -19,7 +35,7 @@ int	ft_thread_timing(long time)
 	current_time = ft_take_time();
 	while (ft_take_time() - current_time < time)
 	{
-		usleep(500);
+		usleep(100);
 	}
 	return (SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:41 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/14 20:03:20 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/16 19:47:53 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,16 @@
 typedef struct s_table t_table;
 typedef pthread_mutex_t t_mutex;
 
+typedef enum e_state_changes
+{
+	SLEEP = 0,
+	EAT,
+	THINK,
+	DEAD,
+	RIGHT_HAND,
+	LEFT_HAND
+}			t_state_c;
+
 typedef struct s_fork
 {
 	int		f_id;
@@ -44,27 +54,42 @@ typedef struct s_fork
 typedef struct s_philo
 {
 	pthread_t	tid;
+	int			philo_full;
+	t_mutex		philo_lock;
 	int			x;
+	int			meal_counter;
+	long		last_eat_time;
 	t_table		*table;
+	t_fork		*right_fork;
+	t_fork		*left_fork;
 }				t_philo;
 
 typedef struct s_table
 {
-	long	nbr_philo;
-	long	tt_die;
-	long	tt_eat;
-	long	tt_sleep;
-	long	philo_must_eat_nbr;
-	t_fork	*f;
-	t_philo	*p;
+	long		nbr_philo;
+	long		tt_die;
+	long		tt_eat;
+	long		tt_sleep;
+	long		philo_must_eat_nbr;
+	long		start_time;
+	int			start_threads_same_time;
+	int			done;
+	long		synchro_run_nbr;
+	pthread_t	table_monitor;
+	t_mutex		table_lock;
+	t_mutex		write_lock;
+	t_fork		*f;
+	t_philo		*p;
 }				t_table;
 
 long		ft_atol(const char *str);
-int			ft_parse_init(int ac, char **av);
+int			ft_parse_init(t_table *table, int ac, char **av);
 int			ft_parse_input5(t_table *table, char **av);
 int			ft_parse_input6(t_table *table, char **av);
 long		ft_take_time(void);
 int			ft_thread_timing(long time);
 void		ft_error_str(char *str);
+void		ft_init_philo(t_table *table);
+void		ft_init_fork(t_table *table);
 
 #endif
