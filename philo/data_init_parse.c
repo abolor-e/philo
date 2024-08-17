@@ -65,20 +65,34 @@ int	ft_parse_input(t_table *table, int ac, char **av)
 	return (SUCCESS);
 }
 
-void	ft_init_fork(t_table *table)
-{
-	int	i;
+// static void	ft_init_fork(t_table *table)
+// {
+// 	int	i;
 
-	i = 0;
-	while (i < table->nbr_philo)
-	{
-		pthread_mutex_init(&table->f[i].fork, NULL);
-		table->f[i].f_id = i;
-		i++;
-	}
-}
+// 	i = 0;
+// 	while (i < table->nbr_philo)
+// 	{
+// 		pthread_mutex_init(&table->f[i].fork, NULL);
+// 		table->f[i].f_id = i;
+// 		i++;
+// 	}
+// }
 
-void	ft_init_philo(t_table *table)
+// static void assign_fork(t_philo *philo, t_fork *fork)
+// {
+// 	if (philo->x % 2 == 0)
+// 	{
+// 		philo->right_fork = &fork[philo->x - 1];
+// 		philo->left_fork = &fork[philo->x % philo->table->nbr_philo];
+// 	}
+// 	else if (philo->x % 2 == 1)
+// 	{
+// 		philo->left_fork = &fork[philo->x - 1];
+// 		philo->right_fork = &fork[philo->x % philo->table->nbr_philo];
+// 	}
+// }
+
+static void	ft_init_philo(t_table *table)
 {
 	int		i;
 	t_philo	*philo;
@@ -97,15 +111,20 @@ void	ft_init_philo(t_table *table)
 			philo->right_fork = &table->f[philo->x - 1];
 			philo->left_fork = &table->f[philo->x % table->nbr_philo];
 		}
-		else
+		if (philo->x % 2 == 1)
+		{
 			philo->left_fork = &table->f[philo->x - 1];
 			philo->right_fork = &table->f[philo->x % table->nbr_philo];
+		}
 		i++;
 	}
 }
 
 int	ft_parse_init(t_table *table, int ac, char **av)
 {
+	int i;
+
+	i = 0;
 	if (ft_parse_input(table, ac, av) == ERROR)
 		return (ERROR);
 	table->start_threads_same_time = 0;
@@ -119,7 +138,13 @@ int	ft_parse_init(t_table *table, int ac, char **av)
 	table->f = malloc(sizeof(t_fork) * table->nbr_philo);
 	if (!table->f)
 		return (ft_error_str(MSG7), ERROR);
-	ft_init_fork(table);
+	//ft_init_fork(table);
+	while (i < table->nbr_philo)
+	{
+		pthread_mutex_init(&table->f[i].fork, NULL);
+		table->f[i].f_id = i;
+		i++;
+	}
 	ft_init_philo(table);
 	// printf("table input nbr philo: %ld\n", table->nbr_philo);
 	// printf("table input time tdie: %ld\n", table->tt_die);

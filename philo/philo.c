@@ -57,6 +57,7 @@ int	main(int ac, char **av)
 			return (ERROR);
 		ft_main_operation(&table);
 		ft_free(&table);
+		return (SUCCESS);
 	}
 	else
 		return (ft_error_str(MSG5), ERROR);

@@ -82,6 +82,7 @@ typedef struct s_table
 	t_philo		*p;
 }				t_table;
 
+int	ft_parse_input(t_table *table, int ac, char **av);
 long		ft_atol(const char *str);
 int			ft_parse_init(t_table *table, int ac, char **av);
 int			ft_parse_input5(t_table *table, char **av);
@@ -89,8 +90,15 @@ int			ft_parse_input6(t_table *table, char **av);
 long		ft_take_time(void);
 int			ft_thread_timing(long time);
 void		ft_error_str(char *str);
-void		ft_init_philo(t_table *table);
-void		ft_init_fork(t_table *table);
+//void		ft_init_philo(t_table *table);
+//void		ft_init_fork(t_table *table);
+int			ft_no_race_argcheck(int *a, t_mutex *mtx);
+void		ft_write_state_change(t_state_c state, t_philo *philo);
+void	*ft_routine(void *arg);
+void	*ft_routine_monitor(void *arg);
+void	*ft_single_philo(void *arg);
+void ft_think(t_philo *philo, int i);
+void	no_synchro(t_philo *philo);
 
 void	ft_main_operation(t_table *table);
 void	ft_free(t_table *table);

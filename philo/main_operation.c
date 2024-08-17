@@ -60,9 +60,41 @@ static void	ft_routine_eat(t_philo *philo)
 	pthread_mutex_unlock(&philo->right_fork->fork);
 }
 
-static void ft_think(t_philo *philo)
+void ft_think(t_philo *philo, int i)
 {
-	ft_write_state_change(THINK, philo);
+	long	teat;
+	long	tsleep;
+	long	tthink;
+
+	if (!i)
+		ft_write_state_change(THINK, philo);
+	if (philo->table->nbr_philo % 2 == 0)
+		return ;
+
+	teat = philo->table->tt_eat;
+	tsleep = philo->table->tt_sleep;
+	tthink = teat * 2 - tsleep;
+	if (tthink < 0)
+		tthink = 0;
+	ft_thread_timing(tthink * 0.42);
+}
+
+void	no_synchro(t_philo *philo)
+{
+	if (philo->table->nbr_philo % 2 == 0)
+	{
+		if (philo->x % 2 == 0)
+		{
+			ft_thread_timing(3e4);
+		}
+	}
+	else
+	{
+		if (philo->x % 2 == 0)
+		{
+			ft_think(philo, 1);
+		}
+	}
 }
 
 void	*ft_routine(void *arg)
@@ -80,7 +112,9 @@ void	*ft_routine(void *arg)
 	philo->table->synchro_run_nbr++;
 	pthread_mutex_unlock(&philo->table->table_lock);
 
-	while (!ft_no_race_argcheck(&philo->table->done, &philo->table->table_lock))
+	no_synchro(philo);
+
+	while (ft_no_race_argcheck(&philo->table->done, &philo->table->table_lock) == 0)
 	{
 		//am i full
 		if (philo->philo_full == 1)
@@ -91,7 +125,7 @@ void	*ft_routine(void *arg)
 		ft_write_state_change(SLEEP, philo);
 		ft_thread_timing(philo->table->tt_sleep);
 		//think
-		ft_think(philo);
+		ft_think(philo, 0);
 		//ft_write_state_change(THINK, philo);
 	}
 	return (NULL);
@@ -184,7 +218,11 @@ void	ft_main_operation(t_table *table)
 	{
 		while (i < table->nbr_philo)
 		{
-			pthread_create(&table->p->tid, NULL, ft_routine, &table->p[i]);
+			if (pthread_create(&table->p[i].tid, NULL, ft_routine, &table->p[i]) != 0)
+			{
+				printf("ERROR: thread creation error!!!");
+				table->p[i].tid = 0;
+			}
 			i++;
 		}
 	}
@@ -209,4 +247,5 @@ void	ft_main_operation(t_table *table)
 	pthread_mutex_unlock(&table->table_lock);
 
 	pthread_join(table->table_monitor, NULL);
+	return ;
 }

@@ -26,6 +26,7 @@ void	ft_free(t_table *table)
 	pthread_mutex_destroy(&table->write_lock);
 	free(table->p);
 	free(table->f);
+	return ;
 }
 
 int	ft_thread_timing(long time)
