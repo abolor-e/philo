@@ -1,6 +1,6 @@
 NAME 		= philo
 CC 			= gcc
-CFLAGS 		= -I. -g3 -g -fsanitize=address -Wall -Wextra -Werror
+CFLAGS 		= -I. -g3 -g -fsanitize=thread -Wall -Wextra -Werror
 THREAD_FLG	= -pthread
 
 RED			= \033[1;31m
@@ -11,6 +11,7 @@ GREEN		= \033[0;32m
 SRC			= philo.c	\
 			  philo_utils.c	\
 			  data_init_parse.c \
+			  main_operation.c \
 			  
 
 

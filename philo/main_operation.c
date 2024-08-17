@@ -1,34 +1,46 @@
 #include "philo.h"	
 
-void	ft_write_state_change(t_state_c state, t_philo *philo)
+int	ft_no_race_argcheck(int *a, t_mutex *mtx)
 {
 	int	i;
 
-	i = ft_take_time();
+	pthread_mutex_lock(mtx);
+	i = *a;
+	pthread_mutex_unlock(mtx);
+	return (i);
+}
+
+void	ft_write_state_change(t_state_c state, t_philo *philo)
+{
+	long	i;
+
+	if (philo->philo_full == 1)
+		return ;
 	pthread_mutex_lock(&philo->table->write_lock);
-	if (philo->table->done == 0)
+	i = ft_take_time() - philo->table->start_time; 
+	if (ft_no_race_argcheck(&philo->table->done, &philo->table->table_lock) == 0)
 	{
 		if (state == SLEEP)
-			printf("%ld %d is sleeping\n", i - philo->table->start_time, philo->x);
+			printf("%ld %d is sleeping\n", i, philo->x);
 		else if (state == EAT)
-			printf("%ld %d is eating\n", i - philo->table->start_time, philo->x);
+			printf("%ld %d is eating\n", i, philo->x);
 		else if (state == THINK)
-			printf("%ld %d is thinking\n", i - philo->table->start_time, philo->x);
+			printf("%ld %d is thinking\n", i, philo->x);
 		else if (state == LEFT_HAND)
-			printf("%ld %d has taken a fork\n", i - philo->table->start_time, philo->x);
+			printf("%ld %d has taken a fork\n", i, philo->x);
 		else if (state == RIGHT_HAND)
-			printf("%ld %d has taken a fork\n", i - philo->table->start_time, philo->x);
-		else
-			printf("%ld %d died\n", i - philo->table->start_time, philo->x);
+			printf("%ld %d has taken a fork\n", i, philo->x);
 	}
+	else if (state == DEAD)
+		printf("%ld %d died\n", i, philo->x);
 	pthread_mutex_unlock(&philo->table->write_lock);
 }
 
 static void	ft_routine_eat(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->left_fork->fork);
-	ft_write_state_change(LEFT_HAND, philo);
 	pthread_mutex_lock(&philo->right_fork->fork);
+	ft_write_state_change(LEFT_HAND, philo);
 	ft_write_state_change(RIGHT_HAND, philo);
 
 	pthread_mutex_lock(&philo->philo_lock);
@@ -40,22 +52,17 @@ static void	ft_routine_eat(t_philo *philo)
 	ft_thread_timing(philo->table->tt_eat);
 	if (philo->table->philo_must_eat_nbr == philo->meal_counter)
 	{
-		pthread_mutex_lock(&philo->table->table_lock);
+		pthread_mutex_lock(&philo->philo_lock);
 		philo->philo_full = 1;
-		pthread_mutex_unlock(&philo->table->table_lock);
+		pthread_mutex_unlock(&philo->philo_lock);
 	}
 	pthread_mutex_unlock(&philo->left_fork->fork);
 	pthread_mutex_unlock(&philo->right_fork->fork);
 }
 
-int	ft_no_race_argcheck(int *a, t_mutex *mtx)
+static void ft_think(t_philo *philo)
 {
-	int	i;
-
-	pthread_mutex_lock(&mtx);
-	i = *a;
-	pthread_mutex_unlock(&mtx);
-	return (i);
+	ft_write_state_change(THINK, philo);
 }
 
 void	*ft_routine(void *arg)
@@ -63,8 +70,8 @@ void	*ft_routine(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (!ft_no_race_argcheck(&philo->table->start_threads_same_time, &philo->table->table_lock))
-
+	while (ft_no_race_argcheck(&philo->table->start_threads_same_time, &philo->table->table_lock) == 0)
+		;
 	pthread_mutex_lock(&philo->philo_lock);
 	philo->last_eat_time = ft_take_time();
 	pthread_mutex_unlock(&philo->philo_lock);
@@ -84,8 +91,10 @@ void	*ft_routine(void *arg)
 		ft_write_state_change(SLEEP, philo);
 		ft_thread_timing(philo->table->tt_sleep);
 		//think
-		ft_write_state_change(THINK, philo);
+		ft_think(philo);
+		//ft_write_state_change(THINK, philo);
 	}
+	return (NULL);
 }
 
 static int	ft_die(t_philo *philo)
@@ -101,7 +110,7 @@ static int	ft_die(t_philo *philo)
 	time = ft_take_time() - i;
 	if (time > philo->table->tt_die)
 		return (1);
-	return (0);
+	return (0); 
 }
 
 void	*ft_routine_monitor(void *arg)
@@ -111,8 +120,8 @@ void	*ft_routine_monitor(void *arg)
 
 	table = (t_table *)arg;
 	while (ft_thread_synchro(&table->table_lock, &table->synchro_run_nbr, table->nbr_philo) == 0)
-	
-	while (!ft_no_race_argcheck(&table->done, &table->table_lock))
+		;
+	while (ft_no_race_argcheck(&table->done, &table->table_lock) == 0)
 	{
 		i = 0;
 		while (i < table->nbr_philo && !ft_no_race_argcheck(&table->done, &table->table_lock))
@@ -120,9 +129,9 @@ void	*ft_routine_monitor(void *arg)
 			if (ft_die(table->p + i) == 1)
 			{
 				pthread_mutex_lock(&table->table_lock);
-				table->done == 1;
+				table->done = 1;
 				pthread_mutex_unlock(&table->table_lock);
-				ft_write_state_change(DEAD, &table->p);
+				ft_write_state_change(DEAD, table->p);
 			}
 		}
 	}
@@ -134,10 +143,10 @@ int	ft_thread_synchro(t_mutex *mtx, long *t_nbr, long p_nbr)
 	int	i;
 
 	i = 0;
-	pthread_mutex_lock(&mtx);
+	pthread_mutex_lock(mtx);
 	if (*t_nbr == p_nbr)
 		i = 1;
-	pthread_mutex_unlock(&mtx);
+	pthread_mutex_unlock(mtx);
 	return (i);
 }
 
@@ -147,12 +156,18 @@ void	*ft_single_philo(void *arg)
 
 	philo = (t_philo *)arg;
 	while (!ft_no_race_argcheck(&philo->table->start_threads_same_time, &philo->table->table_lock))
+		;
 	pthread_mutex_lock(&philo->philo_lock);
 	philo->last_eat_time = ft_take_time();
 	pthread_mutex_unlock(&philo->philo_lock);
+
+	pthread_mutex_lock(&philo->table->table_lock);
+	philo->table->synchro_run_nbr++;
+	pthread_mutex_unlock(&philo->table->table_lock);
+
 	ft_write_state_change(LEFT_HAND, philo);
 	while (!ft_no_race_argcheck(&philo->table->done, &philo->table->table_lock))
-		usleep(250);
+		usleep(50);
 	return (NULL);
 }
 
@@ -162,27 +177,36 @@ void	ft_main_operation(t_table *table)
 
 	i = 0;
 	if (table->nbr_philo == 1)
-		pthread_create(table->p[0].tid, NULL, ft_single_philo, &table->p[0]);
+		pthread_create(&table->p[0].tid, NULL, ft_single_philo, &table->p[0]);
+	else if (table->philo_must_eat_nbr == 0)
+		return ; 
 	else
 	{
-		while (i++ < table->nbr_philo)
-			pthread_create(table->p->tid, NULL, ft_routine, &table->p[i]);
+		while (i < table->nbr_philo)
+		{
+			pthread_create(&table->p->tid, NULL, ft_routine, &table->p[i]);
+			i++;
+		}
 	}
 	//monitoring
 	pthread_create(&table->table_monitor, NULL, ft_routine_monitor, table);
 	
 	//
 	table->start_time = ft_take_time();
+
 	pthread_mutex_lock(&table->table_lock);
 	table->start_threads_same_time = 1;
 	pthread_mutex_unlock(&table->table_lock);
-	i = 0;
-	while (i++ < table->nbr_philo)
-		pthread_join(&table->p[i].tid, NULL);
 
+	i = 0;
+	while (i < table->nbr_philo)
+	{
+		pthread_join(table->p[i].tid, NULL);
+		i++;
+	}
 	pthread_mutex_lock(&table->table_lock);
 	table->done = 1;
 	pthread_mutex_unlock(&table->table_lock);
 
-	pthread_join(&table->table_monitor, NULL);
+	pthread_join(table->table_monitor, NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:32 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/15 15:29:35 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/17 16:09:59 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int	main(int ac, char **av)
 		if (ft_parse_init(&table, ac, av) == ERROR)
 			return (ERROR);
 		ft_main_operation(&table);
+		ft_free(&table);
 	}
 	else
 		return (ft_error_str(MSG5), ERROR);

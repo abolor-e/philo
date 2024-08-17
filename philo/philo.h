@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:41 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/16 19:47:53 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/17 14:23:00 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,5 +91,10 @@ int			ft_thread_timing(long time);
 void		ft_error_str(char *str);
 void		ft_init_philo(t_table *table);
 void		ft_init_fork(t_table *table);
+
+void	ft_main_operation(t_table *table);
+void	ft_free(t_table *table);
+int		ft_thread_synchro(t_mutex *mtx, long *t_nbr, long p_nbr);
+
 
 #endif

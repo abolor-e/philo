@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:33:35 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/16 19:34:05 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/17 16:34:09 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	ft_parse_input5(t_table *table, char **av)
 	table->tt_die = ft_atol(av[2]);
 	table->tt_eat = ft_atol(av[3]);
 	table->tt_sleep = ft_atol(av[4]);
-	table->philo_must_eat_nbr = 0;
+	table->philo_must_eat_nbr = -1;
 	if (!table->nbr_philo || !table->tt_die || !table->tt_eat
 		|| !table->tt_sleep)
 		return (ft_error_str(MSG2), ERROR);
@@ -92,7 +92,7 @@ void	ft_init_philo(t_table *table)
 		philo->meal_counter = 0;
 		philo->philo_full = 0;
 		pthread_mutex_init(&philo->philo_lock, NULL);
-		if ((philo->x) % 2 == 0)
+		if (philo->x % 2 == 0)
 		{
 			philo->right_fork = &table->f[philo->x - 1];
 			philo->left_fork = &table->f[philo->x % table->nbr_philo];
@@ -106,7 +106,7 @@ void	ft_init_philo(t_table *table)
 
 int	ft_parse_init(t_table *table, int ac, char **av)
 {
-	if (ft_parse_input(&table, ac, av) == ERROR)
+	if (ft_parse_input(table, ac, av) == ERROR)
 		return (ERROR);
 	table->start_threads_same_time = 0;
 	table->done = 0;
@@ -119,12 +119,12 @@ int	ft_parse_init(t_table *table, int ac, char **av)
 	table->f = malloc(sizeof(t_fork) * table->nbr_philo);
 	if (!table->f)
 		return (ft_error_str(MSG7), ERROR);
-	ft_init_fork(&table);
-	ft_init_philo(&table);
-	printf("table input nbr philo: %ld\n", table->nbr_philo);
-	printf("table input time tdie: %ld\n", table->tt_die);
-	printf("table input time teat: %ld\n", table->tt_eat);
-	printf("table input t t sleep: %ld\n", table->tt_sleep);
-	printf("table input must eat : %ld\n", table->philo_must_eat_nbr);
+	ft_init_fork(table);
+	ft_init_philo(table);
+	// printf("table input nbr philo: %ld\n", table->nbr_philo);
+	// printf("table input time tdie: %ld\n", table->tt_die);
+	// printf("table input time teat: %ld\n", table->tt_eat);
+	// printf("table input t t sleep: %ld\n", table->tt_sleep);
+	// printf("table input must eat : %ld\n", table->philo_must_eat_nbr);
 	return (SUCCESS);
 }
