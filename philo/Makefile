@@ -1,6 +1,6 @@
 NAME 		= philo
 CC 			= gcc
-CFLAGS 		= -g -fsanitize=address -Wall -Wextra -Werror
+CFLAGS 		= -g -fsanitize=thread -Wall -Wextra -Werror
 THREAD_FLG	= -pthread
 
 RED			= \033[1;31m

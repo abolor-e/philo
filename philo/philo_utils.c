@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:50 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/16 18:58:29 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/18 15:48:05 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	ft_thread_timing(long time)
 	current_time = ft_take_time();
 	while (ft_take_time() - current_time < time)
 	{
-		usleep(100);
+		usleep(5);
 	}
 	return (SUCCESS);
 }
@@ -44,7 +44,7 @@ int	ft_thread_timing(long time)
 long	ft_take_time(void)
 {
 	struct timeval	time;
-	
+
 	if (gettimeofday(&time, NULL) == -1)
 		write(2, "gettimeofday() error\n", 22);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
