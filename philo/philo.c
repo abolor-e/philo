@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:32 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/18 15:11:56 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/18 19:26:06 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,20 @@ static void	ft_init_fork(t_table *table)
 	}
 }
 
+static void assign_fork(t_philo *philo, t_fork *fork, int pos)
+{
+	int philo_nbr;
+
+	philo_nbr = philo->table->nbr_philo;
+	philo->left_fork = &fork[pos];
+	philo->right_fork = &fork[(pos + 1) % philo_nbr];
+	if (philo->x % 2 == 0)
+	{
+		philo->right_fork = &fork[pos];
+		philo->left_fork = &fork[(pos + 1) % philo_nbr];
+	}
+}
+
 static void	ft_init_philo(t_table *table)
 {
 	int		i;
@@ -39,13 +53,14 @@ static void	ft_init_philo(t_table *table)
 		philo->meal_counter = 0;
 		philo->philo_full = 0;
 		pthread_mutex_init(&philo->philo_lock, NULL);
-		philo->left_fork = &table->f[philo->x - 1];
-		philo->right_fork = &table->f[philo->x % table->nbr_philo];
-		if (philo->x % 2 == 0)
-		{
-			philo->right_fork = &table->f[philo->x - 1];
-			philo->left_fork = &table->f[philo->x % table->nbr_philo];
-		}
+		assign_fork(philo, table->f, i);
+		// philo->left_fork = &table->f[philo->x - 1];
+		// philo->right_fork = &table->f[philo->x % table->nbr_philo];
+		// if (philo->x % 2 == 0)
+		// {
+		// 	philo->right_fork = &table->f[philo->x - 1];
+		// 	philo->left_fork = &table->f[philo->x % table->nbr_philo];
+		// }
 		i++;
 	}
 }

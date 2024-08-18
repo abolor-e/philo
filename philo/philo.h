@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:41 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/18 15:10:12 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/18 20:37:02 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int		ft_parse_init(t_table *table, int ac, char **av);
 int		ft_parse_input5(t_table *table, char **av);
 int		ft_parse_input6(t_table *table, char **av);
 long	ft_take_time(void);
-int		ft_thread_timing(long time);
+int		ft_thread_timing(t_table *table, long time);
 void	ft_error_str(char *str);
 //void	ft_init_philo(t_table *table);
 //void	ft_init_fork(t_table *table);
@@ -98,11 +98,13 @@ void	*ft_routine(void *arg);
 void	*ft_routine_monitor(void *arg);
 void	*ft_single_philo(void *arg);
 void	ft_think(t_philo *philo, int i);
-// void	no_synchro(t_philo *philo);
+ void	no_synchro(t_philo *philo);
 void	ft_main_operation(t_table *table);
 void	ft_free(t_table *table);
 int		ft_thread_synchro(t_mutex *mtx, long *t_nbr, long p_nbr);
 
 void	precise_usleep(long time, t_table *table);
 
+void	ft_sleep(t_table *table, long time);
+long	ft_no_race_argcheck1(long *a, t_mutex *mtx);
 #endif

@@ -1,6 +1,6 @@
 NAME 		= philo
 CC 			= gcc
-CFLAGS 		= -g -fsanitize=thread -Wall -Wextra -Werror
+CFLAGS 		= -Wall -Wextra -Werror -finline-functions -fvectorize -fslp-vectorize -ffast-math -falign-functions -funroll-loops -fstrict-aliasing -fomit-frame-pointer -flto -Ofast -O1 -O2 -Os -O3 
 THREAD_FLG	= -pthread
 
 RED			= \033[1;31m
@@ -12,6 +12,8 @@ SRC			= philo.c	\
 			  philo_utils.c	\
 			  data_init_parse.c \
 			  main_operation.c \
+			  time.c	\
+			  operation_utils.c
 			  
 
 

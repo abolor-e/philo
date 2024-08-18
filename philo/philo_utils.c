@@ -6,11 +6,38 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 18:11:50 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/18 15:48:05 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/18 20:43:20 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	ft_write_state_change(t_state_c state, t_philo *philo)
+{
+	long	i;
+
+	if (philo->philo_full == 1)
+		return ;
+	pthread_mutex_lock(&philo->table->write_lock);
+	i = ft_take_time() - philo->table->start_time;
+	if (ft_no_race_argcheck(&philo->table->done,
+			&philo->table->table_lock) == 0)
+	{
+		if (state == SLEEP)
+			printf("%ld %d is sleeping\n", i, philo->x);
+		else if (state == EAT)
+			printf("%ld %d is eating\n", i, philo->x);
+		else if (state == THINK)
+			printf("%ld %d is thinking\n", i, philo->x);
+		else if (state == LEFT_HAND)
+			printf("%ld %d has taken a fork\n", i, philo->x);
+		else if (state == RIGHT_HAND)
+			printf("%ld %d has taken a fork\n", i, philo->x);
+	}
+	else if (state == DEAD)
+		printf("%ld %d died\n", i, philo->x);
+	pthread_mutex_unlock(&philo->table->write_lock);
+}
 
 void	ft_free(t_table *table)
 {
@@ -29,25 +56,17 @@ void	ft_free(t_table *table)
 	return ;
 }
 
-int	ft_thread_timing(long time)
+int	ft_thread_timing(t_table *table, long time)
 {
 	long	current_time;
 
 	current_time = ft_take_time();
 	while (ft_take_time() - current_time < time)
 	{
-		usleep(5);
+		//usleep(5);
+		ft_sleep(table, 1 / 1000);
 	}
 	return (SUCCESS);
-}
-
-long	ft_take_time(void)
-{
-	struct timeval	time;
-
-	if (gettimeofday(&time, NULL) == -1)
-		write(2, "gettimeofday() error\n", 22);
-	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
 long	ft_atol(const char *str)
@@ -76,7 +95,22 @@ long	ft_atol(const char *str)
 	return (res * s);
 }
 
-void	ft_error_str(char *str)
+void	ft_think(t_philo *philo, int i)
 {
-	printf("%s\n", str);
+	long	teat;
+	long	tsleep;
+	long	tthink;
+
+	if (!i)
+		ft_write_state_change(THINK, philo);
+	if (philo->table->nbr_philo % 2 == 0)
+		return ;
+	teat = philo->table->tt_eat;
+	tsleep = philo->table->tt_sleep;
+	tthink = teat * 2 - tsleep;
+	if (tthink < 0)
+		tthink = 0;
+	precise_usleep(tthink * 0.42, philo->table);
+	// ft_thread_timing(tthink * 0.45);
+ 	precise_usleep(tthink * 0.4, philo->table);
 }

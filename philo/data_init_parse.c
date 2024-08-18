@@ -6,7 +6,7 @@
 /*   By: abolor-e <abolor-e@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:33:35 by abolor-e          #+#    #+#             */
-/*   Updated: 2024/08/18 13:52:37 by abolor-e         ###   ########.fr       */
+/*   Updated: 2024/08/18 20:35:49 by abolor-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,7 @@ int	ft_parse_input(t_table *table, int ac, char **av)
 	return (SUCCESS);
 }
 
-
-
+void	ft_error_str(char *str)
+{
+	printf("%s\n", str);
+}
